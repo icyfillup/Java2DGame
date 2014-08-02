@@ -2,7 +2,6 @@ package com.icyfillup.game;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
@@ -10,6 +9,10 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
+
+import com.icyfillup.game.gfx.Screen;
+import com.icyfillup.game.gfx.SpriteSheet;
+
 
 public class Game extends Canvas implements Runnable
 {
@@ -27,6 +30,8 @@ public class Game extends Canvas implements Runnable
 	
 	private BufferedImage		image				= new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	private int[]				pixels				= ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+	
+	private Screen screen;
 	
 	public Game()
 	{
@@ -46,6 +51,11 @@ public class Game extends Canvas implements Runnable
 		frame.setVisible(true);
 	}
 	
+	public void init()
+	{
+		screen = new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet.png"));
+	}
+	
 	public void run()
 	{
 		long lastTime = System.nanoTime();
@@ -56,6 +66,8 @@ public class Game extends Canvas implements Runnable
 		
 		long lastTimer = System.currentTimeMillis();
 		double delta = 0;
+		
+		init();
 		
 		while (running)
 		{
@@ -74,7 +86,7 @@ public class Game extends Canvas implements Runnable
 			
 			try
 			{
-				Thread.sleep(2);
+				Thread.sleep(3);
 			}
 			catch (InterruptedException e)
 			{
@@ -101,10 +113,8 @@ public class Game extends Canvas implements Runnable
 	{
 		tickCount++;
 		
-		for(int i = 0; i < pixels.length; i++)
-		{
-			pixels[i] = i + tickCount;
-		}
+//		screen.xOffset++;
+//		screen.yOffset++;
 	}
 	
 	public void render()
@@ -116,8 +126,11 @@ public class Game extends Canvas implements Runnable
 			return;
 		}
 		
+		screen.render(pixels, 0, WIDTH);
+		
 		Graphics g = bs.getDrawGraphics();
 		
+		g.drawRect(0, 0, getWidth(), getHeight());
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
 		
 		g.dispose();
