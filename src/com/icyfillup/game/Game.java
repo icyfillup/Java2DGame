@@ -13,14 +13,13 @@ import javax.swing.JFrame;
 import com.icyfillup.game.gfx.Screen;
 import com.icyfillup.game.gfx.SpriteSheet;
 
-
 public class Game extends Canvas implements Runnable
 {
 	private static final long	serialVersionUID	= 1L;
 	
 	public static final int		WIDTH				= 160;
 	public static final int		HEIGHT				= WIDTH / 12 * 9;
-	public static final int		SCALE				= 3;
+	public static final int		SCALE				= 5;
 	public static final String	NAME				= "Game";
 	
 	private JFrame				frame;
@@ -31,7 +30,9 @@ public class Game extends Canvas implements Runnable
 	private BufferedImage		image				= new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	private int[]				pixels				= ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 	
-	private Screen screen;
+	private Screen				screen;
+	
+	public InputHandler			input;
 	
 	public Game()
 	{
@@ -54,6 +55,7 @@ public class Game extends Canvas implements Runnable
 	public void init()
 	{
 		screen = new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet.png"));
+		input = new InputHandler(this);
 	}
 	
 	public void run()
@@ -113,8 +115,25 @@ public class Game extends Canvas implements Runnable
 	{
 		tickCount++;
 		
-//		screen.xOffset++;
-//		screen.yOffset++;
+		if (input.up.isPressed())
+		{
+			screen.yOffset--;
+		}
+		if (input.down.isPressed())
+		{
+			screen.yOffset++;
+		}
+		if (input.left.isPressed())
+		{
+			screen.xOffset--;
+		}
+		if (input.right.isPressed())
+		{
+			screen.xOffset++;
+		}
+		
+		// screen.xOffset++;
+		// screen.yOffset++;
 	}
 	
 	public void render()
@@ -135,7 +154,6 @@ public class Game extends Canvas implements Runnable
 		
 		g.dispose();
 		bs.show();
-		
 		
 	}
 	
