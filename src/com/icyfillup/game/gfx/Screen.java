@@ -23,6 +23,12 @@ public class Screen {
 		pixels = new int[width * height];
 	}
 	
+	public void render(int xPos, int yPos, int tile, int colour) 
+	{
+		render(xPos, yPos, tile, colour, false, false); 
+	}
+	
+	
 	public void render(int xPos, int yPos, int tile, int colour, boolean mirrorX, boolean mirrorY) 
 	{
 		xPos -= xOffset;
@@ -42,10 +48,8 @@ public class Screen {
 				int xSheet = x;
 				if(mirrorX) xSheet = 7 - x;
 				if(x + xPos < 0 || x + xPos >= width) continue;
-				int col = (colour >> (sheet.pixels[xSheet + ySheet * sheet.width + tileOffset] * 8) & 255);
+				int col = (colour >> (sheet.pixels[xSheet + ySheet * sheet.width + tileOffset] * 8)) & 255;
 				if(col < 255) pixels[(x + xPos) + (y + yPos) * width] = col;
-				
-				
 			}
 		}
 	}

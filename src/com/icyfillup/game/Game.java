@@ -11,6 +11,7 @@ import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
 
 import com.icyfillup.game.gfx.Colours;
+import com.icyfillup.game.gfx.Font;
 import com.icyfillup.game.gfx.Screen;
 import com.icyfillup.game.gfx.SpriteSheet;
 
@@ -19,7 +20,7 @@ public class Game extends Canvas implements Runnable {
 	
 	public static final int		WIDTH				= 160;
 	public static final int		HEIGHT				= WIDTH / 12 * 9;
-	public static final int		SCALE				= 5;
+	public static final int		SCALE				= 3;
 	public static final String	NAME				= "Game";
 	
 	private JFrame				frame;
@@ -27,8 +28,14 @@ public class Game extends Canvas implements Runnable {
 	public boolean				running				= false;
 	public int					tickCount			= 0;
 	
-	private BufferedImage		image				= new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-	private int[]				pixels				= ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+	private BufferedImage		image				= new BufferedImage(
+															WIDTH,
+															HEIGHT,
+															BufferedImage.TYPE_INT_RGB);
+	private int[]				pixels				= ((DataBufferInt) image
+															.getRaster()
+															.getDataBuffer())
+															.getData();
 	private int[]				colours				= new int[6 * 6 * 6];
 	
 	private Screen				screen;
@@ -121,7 +128,8 @@ public class Game extends Canvas implements Runnable {
 			if (System.currentTimeMillis() - lastTimer >= 1000)
 			{
 				lastTimer += 1000;
-				System.out.println(ticks + " ticks" + ", " + frames + " frames");
+				System.out
+						.println(ticks + " ticks" + ", " + frames + " frames");
 				frames = 0;
 				ticks = 0;
 			}
@@ -162,22 +170,29 @@ public class Game extends Canvas implements Runnable {
 			return;
 		}
 		
-		for(int y = 0; y < 32; y++)
+		for (int y = 0; y < 32; y++)
 		{
-			for(int x = 0; x < 32; x++)
+			for (int x = 0; x < 32; x++)
 			{
-				boolean flipX = x % 2 == 0;
-				boolean flipY = y % 2 == 0;
-				screen.render(x << 3, y << 3, 0, Colours.get(555, 505, 055, 550), flipX, flipY);
+				boolean flipX = x % 2 == 1;
+				boolean flipY = y % 2 == 1;
+				screen.render(x << 3, y << 3, 0,
+						Colours.get(555, 505, 055, 550), flipX, flipY);
 			}
 		}
 		
-		for(int y = 0; y < screen.height; y++)
+		String msg = "Hello world! 0123";
+		Font.render(msg, screen,
+				screen.xOffset + screen.width / 2 - ((msg.length() * 8) / 2),
+				screen.yOffset + screen.height / 2,
+				Colours.get(-1, -1, -1, 000));
+		
+		for (int y = 0; y < screen.height; y++)
 		{
-			for(int x = 0; x < screen.width; x++)
+			for (int x = 0; x < screen.width; x++)
 			{
 				int colourCode = screen.pixels[x + y * screen.width];
-				if(colourCode < 255) pixels[x + y *WIDTH] = colours[colourCode];
+				if (colourCode < 255) pixels[x + y * WIDTH] = colours[colourCode];
 			}
 		}
 		
