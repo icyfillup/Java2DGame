@@ -8,9 +8,9 @@ public class BasicTile extends Tile
 	protected int tileID;
 	protected int tileColour;
 	
-	public BasicTile(int id, int x, int y, int tileColour)
+	public BasicTile(int id, int x, int y, int tileColour, int levelColour)
 	{
-		super(id, false, false);
+		super(id, false, false, levelColour);
 		this.tileID = x + y;
 		this.tileColour = tileColour;
 	}
