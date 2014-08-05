@@ -1,6 +1,7 @@
 package com.icyfillup.game.entities;
 
 import com.icyfillup.game.level.Level;
+import com.icyfillup.game.level.tiles.Tile;
 
 public abstract class Mob extends Entity
 {
@@ -44,6 +45,15 @@ public abstract class Mob extends Entity
 	}
 	
 	public abstract boolean hasCollided(int xa, int ya);
+	
+	protected boolean isSolidTile(int xo, int yo, int x, int y)
+	{
+		if(level == null) return false;
+		Tile lastTile = level.getTile((this.x + x) >> 3, (this.y + y) >> 3);
+		Tile newTile = level.getTile((this.x + x + xo) >> 3, (this.y + y + yo) >> 3);
+		if(!lastTile.equals(newTile) && newTile.isSolid()) return true;
+		return false;
+	}
 	
 	public String getName()
 	{
