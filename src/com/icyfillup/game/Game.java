@@ -10,10 +10,12 @@ import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
+import com.icyfillup.game.entities.Player;
 import com.icyfillup.game.gfx.Colours;
 import com.icyfillup.game.gfx.Font;
 import com.icyfillup.game.gfx.Screen;
 import com.icyfillup.game.gfx.SpriteSheet;
+import com.icyfillup.game.level.Level;
 
 public class Game extends Canvas implements Runnable {
 	private static final long	serialVersionUID	= 1L;
@@ -39,8 +41,9 @@ public class Game extends Canvas implements Runnable {
 	private int[]				colours				= new int[6 * 6 * 6];
 	
 	private Screen				screen;
-	
 	public InputHandler			input;
+	public Level				level;
+	public Player player;
 	
 	public Game()
 	{
@@ -80,6 +83,10 @@ public class Game extends Canvas implements Runnable {
 		
 		screen = new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet.png"));
 		input = new InputHandler(this);
+		level = new Level(64, 64);
+		player = new Player(level, 0, 0, input);
+		
+		level.addEntity(player);
 	}
 	
 	public void run()
@@ -140,25 +147,7 @@ public class Game extends Canvas implements Runnable {
 	{
 		tickCount++;
 		
-		if (input.up.isPressed())
-		{
-			screen.yOffset--;
-		}
-		if (input.down.isPressed())
-		{
-			screen.yOffset++;
-		}
-		if (input.left.isPressed())
-		{
-			screen.xOffset--;
-		}
-		if (input.right.isPressed())
-		{
-			screen.xOffset++;
-		}
-		
-		// screen.xOffset++;
-		// screen.yOffset++;
+		level.tick();
 	}
 	
 	public void render()
@@ -170,22 +159,28 @@ public class Game extends Canvas implements Runnable {
 			return;
 		}
 		
-		for (int y = 0; y < 32; y++)
-		{
-			for (int x = 0; x < 32; x++)
-			{
-				boolean flipX = x % 2 == 1;
-				boolean flipY = y % 2 == 1;
-				screen.render(x << 3, y << 3, 0,
-						Colours.get(555, 505, 055, 550), flipX, flipY);
-			}
-		}
+		// String msg = "Hello world! 0123";
+		// Font.render(msg, screen,
+		// screen.xOffset + screen.width / 2 - ((msg.length() * 8) / 2),
+		// screen.yOffset + screen.height / 2,
+		// Colours.get(-1, -1, -1, 000));
 		
-		String msg = "Hello world! 0123";
-		Font.render(msg, screen,
-				screen.xOffset + screen.width / 2 - ((msg.length() * 8) / 2),
-				screen.yOffset + screen.height / 2,
-				Colours.get(-1, -1, -1, 000));
+		int xOffset = player.x - (screen.width / 2); 
+		int yOffset = player.y - (screen.height / 2);
+		
+		level.renderTile(screen, xOffset, yOffset);
+		
+//		for(int x = 0; x < level.width; x++)
+//		{
+//			int colour = Colours.get(-1, -1, -1, 000);
+//			if(x % 10 == 0 && x != 0)
+//			{
+//				colour = Colours.get(-1, -1, -1, 500);
+//			}
+//			Font.render((x % 10) + "", screen, (x * 8), 0, colour);
+//		}
+		
+		level.renderEntities(screen);
 		
 		for (int y = 0; y < screen.height; y++)
 		{
