@@ -2,6 +2,7 @@ package com.icyfillup.game.entities;
 
 import com.icyfillup.game.InputHandler;
 import com.icyfillup.game.gfx.Colours;
+import com.icyfillup.game.gfx.Font;
 import com.icyfillup.game.gfx.Screen;
 import com.icyfillup.game.level.Level;
 
@@ -12,11 +13,13 @@ public class Player extends Mob {
 	private int				scale		= 1;
 	protected boolean		isSwimming	= false;
 	private int				tickCount	= 0;
+	private String userName;
 	
-	public Player(Level level, int x, int y, InputHandler input)
+	public Player(Level level, int x, int y, InputHandler input, String userName)
 	{
 		super(level, "Player", x, y, 1);
 		this.input = input;
+		this.userName = userName;
 	}
 	
 	public void tick()
@@ -112,6 +115,9 @@ public class Player extends Mob {
 			screen.render(xOffset + (modtifier * flipBottom), yOffset + modtifier, xTile + ((yTile + 1) * 32), colour, flipBottom, scale);
 			screen.render(xOffset + modtifier - (modtifier * flipBottom), yOffset + modtifier, (xTile + 1) + ((yTile + 1) * 32), colour, flipBottom, scale);
 		}
+		
+		if(userName != null)
+			Font.render(userName, screen, xOffset - ((userName.length() / 2 - 1) * 8), yOffset - 10, Colours.get(-1, -1, -1, 555), 1);
 		
 	}
 	
