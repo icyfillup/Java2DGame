@@ -12,11 +12,12 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import com.icyfillup.game.entities.Player;
-import com.icyfillup.game.gfx.Colours;
-import com.icyfillup.game.gfx.Font;
 import com.icyfillup.game.gfx.Screen;
 import com.icyfillup.game.gfx.SpriteSheet;
 import com.icyfillup.game.level.Level;
+import com.icyfillup.game.net.GameClient;
+import com.icyfillup.game.net.GameServer;
+import com.icyfillup.game.net.packets.Packet00Login;
 
 public class Game extends Canvas implements Runnable {
 	private static final long	serialVersionUID	= 1L;
@@ -45,6 +46,9 @@ public class Game extends Canvas implements Runnable {
 	public InputHandler			input;
 	public Level				level;
 	public Player player;
+	
+	private GameClient socketClient;
+	private GameServer socketServer;
 	
 	public Game()
 	{
@@ -85,9 +89,12 @@ public class Game extends Canvas implements Runnable {
 		screen = new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet.png"));
 		input = new InputHandler(this);
 		level = new Level("/levels/water_test_level.png");
-		player = new Player(level, 0, 0, input, JOptionPane.showInputDialog(this, "Please enter UserName."));
+//		player = new Player(level, 0, 0, input, JOptionPane.showInputDialog(this, "Please enter UserName."));
+//		level.addEntity(player);
+//		socketClient.sendData("ping".getBytes());
 		
-		level.addEntity(player);
+		Packet00Login loginPacket = new Packet00Login(JOptionPane.showInputDialog(this, "Please enter UserName."));
+		loginPacket.writeData(socketClient);
 	}
 	
 	public void run()
@@ -136,8 +143,7 @@ public class Game extends Canvas implements Runnable {
 			if (System.currentTimeMillis() - lastTimer >= 1000)
 			{
 				lastTimer += 1000;
-				System.out
-						.println(ticks + " ticks" + ", " + frames + " frames");
+				frame.setTitle(ticks + " ticks" + ", " + frames + " frames");
 				frames = 0;
 				ticks = 0;
 			}
@@ -206,6 +212,15 @@ public class Game extends Canvas implements Runnable {
 	{
 		running = true;
 		new Thread(this).start();
+		
+		if(JOptionPane.showConfirmDialog(this, "Do you want to run ther server? ") == 0)
+		{
+			socketServer = new GameServer(this);
+			socketServer.start();
+		}
+		
+		socketClient = new GameClient(this, "localhost");
+		socketClient.start();
 	}
 	
 	private synchronized void stop()
