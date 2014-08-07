@@ -10,8 +10,9 @@ import java.net.UnknownHostException;
 import com.icyfillup.game.Game;
 import com.icyfillup.game.entities.PlayerMP;
 import com.icyfillup.game.net.packets.Packet;
-import com.icyfillup.game.net.packets.Packet00Login;
 import com.icyfillup.game.net.packets.Packet.PacketTypes;
+import com.icyfillup.game.net.packets.Packet00Login;
+import com.icyfillup.game.net.packets.Packet01Disconnect;
 
 public class GameClient extends Thread {
 	private InetAddress		ipAddress;
@@ -77,6 +78,10 @@ public class GameClient extends Thread {
 				game.level.addEntity(player);
 				break;
 			case DISCONNECT:
+				packet = new Packet01Disconnect(data);
+				System.out.println("[" + address.getHostAddress() + ": " + port + "]" + ((Packet01Disconnect) packet).getUsername() + " has left the world...");
+				game.level.removePlayerMP(((Packet01Disconnect)packet).getUsername());
+				
 				break;
 		}
 	}

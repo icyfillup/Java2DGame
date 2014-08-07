@@ -13,6 +13,7 @@ import com.icyfillup.game.entities.PlayerMP;
 import com.icyfillup.game.net.packets.Packet;
 import com.icyfillup.game.net.packets.Packet.PacketTypes;
 import com.icyfillup.game.net.packets.Packet00Login;
+import com.icyfillup.game.net.packets.Packet01Disconnect;
 
 public class GameServer extends Thread
 {
@@ -78,6 +79,10 @@ public class GameServer extends Thread
 				this.addConnection(player, ((Packet00Login) packet));
 				break;
 			case DISCONNECT:
+				packet = new Packet01Disconnect(data);
+				System.out.println("[" + address.getHostAddress() + ": " + port + "]" + ((Packet01Disconnect) packet).getUsername() + " has left...");
+				
+				this.removeConnection(((Packet01Disconnect) packet));
 				break;
 		}
 	}
@@ -101,13 +106,42 @@ public class GameServer extends Thread
 				packet = new Packet00Login(p.getUsername());
 				sendData(packet.getData(), player.ipAddress, player.port);
 			}
+			
 		}
 		if(!alreadyConnected)
 		{
 			this.connectedPlayers.add(player);
 		}
 	}
+	
+	private void removeConnection(Packet01Disconnect packet)
+	{
+		this.connectedPlayers.remove(getPlayerMPIndex(packet.getUsername()));
+		packet.writeData(this);
+	}
 
+	public PlayerMP getPlayerMP(String username) 
+	{
+		for(PlayerMP player: connectedPlayers)
+		{
+			if(player.getUsername().equals(username))
+				return player;
+		}
+		return null;
+	}
+	
+	public int getPlayerMPIndex(String username) 
+	{
+		int index = 0;
+		for(PlayerMP player: connectedPlayers)
+		{
+			if(player.getUsername().equals(username))
+				break;
+			index++;
+		}
+		return index;
+	}
+	
 	public void sendData(byte[] data, InetAddress ipAddress, int port)
 	{
 		DatagramPacket packet = new DatagramPacket(data, data.length, ipAddress, port);

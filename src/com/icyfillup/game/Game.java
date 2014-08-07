@@ -28,28 +28,23 @@ public class Game extends Canvas implements Runnable {
 	public static final int		SCALE				= 3;
 	public static final String	NAME				= "Game";
 	
-	private JFrame				frame;
+	public JFrame				frame;
 	
 	public boolean				running				= false;
 	public int					tickCount			= 0;
 	
-	private BufferedImage		image				= new BufferedImage(
-															WIDTH,
-															HEIGHT,
-															BufferedImage.TYPE_INT_RGB);
-	private int[]				pixels				= ((DataBufferInt) image
-															.getRaster()
-															.getDataBuffer())
-															.getData();
+	private BufferedImage		image				= new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+	private int[]				pixels				= ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 	private int[]				colours				= new int[6 * 6 * 6];
 	
 	private Screen				screen;
 	public InputHandler			input;
+	public WindowHandler		windowHandler;
 	public Level				level;
-	public Player player;
+	public Player				player;
 	
-	private GameClient socketClient;
-	private GameServer socketServer;
+	public GameClient			socketClient;
+	public GameServer			socketServer;
 	
 	public Game()
 	{
@@ -89,17 +84,18 @@ public class Game extends Canvas implements Runnable {
 		
 		screen = new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet.png"));
 		input = new InputHandler(this);
+		windowHandler = new WindowHandler(this);
 		level = new Level("/levels/water_test_level.png");
 		player = new PlayerMP(level, 100, 100, input, JOptionPane.showInputDialog(this, "Please enter UserName."), null, -1);
 		level.addEntity(player);
 		Packet00Login loginPacket = new Packet00Login(player.getUsername());
 		
-		if(socketServer != null) 
+		if (socketServer != null)
 		{
-			socketServer.addConnection((PlayerMP)player, loginPacket);
+			socketServer.addConnection((PlayerMP) player, loginPacket);
 		}
 		
-//		socketClient.sendData("ping".getBytes());	
+		// socketClient.sendData("ping".getBytes());
 		loginPacket.writeData(socketClient);
 	}
 	
@@ -178,20 +174,20 @@ public class Game extends Canvas implements Runnable {
 		// screen.yOffset + screen.height / 2,
 		// Colours.get(-1, -1, -1, 000));
 		
-		int xOffset = player.x - (screen.width / 2); 
+		int xOffset = player.x - (screen.width / 2);
 		int yOffset = player.y - (screen.height / 2);
 		
 		level.renderTile(screen, xOffset, yOffset);
 		
-//		for(int x = 0; x < level.width; x++)
-//		{
-//			int colour = Colours.get(-1, -1, -1, 000);
-//			if(x % 10 == 0 && x != 0)
-//			{
-//				colour = Colours.get(-1, -1, -1, 500);
-//			}
-//			Font.render((x % 10) + "", screen, (x * 8), 0, colour);
-//		}
+		// for(int x = 0; x < level.width; x++)
+		// {
+		// int colour = Colours.get(-1, -1, -1, 000);
+		// if(x % 10 == 0 && x != 0)
+		// {
+		// colour = Colours.get(-1, -1, -1, 500);
+		// }
+		// Font.render((x % 10) + "", screen, (x * 8), 0, colour);
+		// }
 		
 		level.renderEntities(screen);
 		
@@ -200,7 +196,8 @@ public class Game extends Canvas implements Runnable {
 			for (int x = 0; x < screen.width; x++)
 			{
 				int colourCode = screen.pixels[x + y * screen.width];
-				if (colourCode < 255) pixels[x + y * WIDTH] = colours[colourCode];
+				if (colourCode < 255)
+					pixels[x + y * WIDTH] = colours[colourCode];
 			}
 		}
 		
@@ -219,7 +216,7 @@ public class Game extends Canvas implements Runnable {
 		running = true;
 		new Thread(this).start();
 		
-		if(JOptionPane.showConfirmDialog(this, "Do you want to run ther server? ") == 0)
+		if (JOptionPane.showConfirmDialog(this, "Do you want to run ther server? ") == 0)
 		{
 			socketServer = new GameServer(this);
 			socketServer.start();
