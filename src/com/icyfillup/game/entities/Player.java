@@ -1,10 +1,12 @@
 package com.icyfillup.game.entities;
 
+import com.icyfillup.game.Game;
 import com.icyfillup.game.InputHandler;
 import com.icyfillup.game.gfx.Colours;
 import com.icyfillup.game.gfx.Font;
 import com.icyfillup.game.gfx.Screen;
 import com.icyfillup.game.level.Level;
+import com.icyfillup.game.net.packets.Packet02Move;
 
 public class Player extends Mob {
 	
@@ -43,6 +45,10 @@ public class Player extends Mob {
 		{
 			move(xa, ya);
 			isMoving = true;
+			
+			Packet02Move packet = new Packet02Move(this.username, x, y);
+			packet.writeData(Game.game.socketClient);
+			
 		}
 		else
 			isMoving = false;

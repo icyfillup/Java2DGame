@@ -13,6 +13,7 @@ import com.icyfillup.game.net.packets.Packet;
 import com.icyfillup.game.net.packets.Packet.PacketTypes;
 import com.icyfillup.game.net.packets.Packet00Login;
 import com.icyfillup.game.net.packets.Packet01Disconnect;
+import com.icyfillup.game.net.packets.Packet02Move;
 
 public class GameClient extends Thread {
 	private InetAddress		ipAddress;
@@ -81,11 +82,13 @@ public class GameClient extends Thread {
 				packet = new Packet01Disconnect(data);
 				System.out.println("[" + address.getHostAddress() + ": " + port + "]" + ((Packet01Disconnect) packet).getUsername() + " has left the world...");
 				game.level.removePlayerMP(((Packet01Disconnect)packet).getUsername());
-				
+			case MOVE:
+				packet = new Packet02Move(data);
+				handlePacket(((Packet02Move) packet));
 				break;
 		}
 	}
-	
+
 	public void sendData(byte[] data)
 	{
 		DatagramPacket packet = new DatagramPacket(data, data.length, ipAddress, 1331);
@@ -97,5 +100,11 @@ public class GameClient extends Thread {
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	
+	private void handlePacket(Packet02Move packet)
+	{
+		this.game.level.movePlayer(packet.getUsername(), packet.getX(), packet.getY());
 	}
 }
