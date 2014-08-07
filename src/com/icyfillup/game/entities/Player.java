@@ -13,13 +13,13 @@ public class Player extends Mob {
 	private int				scale		= 1;
 	protected boolean		isSwimming	= false;
 	private int				tickCount	= 0;
-	private String userName;
+	private String username;
 	
 	public Player(Level level, int x, int y, InputHandler input, String userName)
 	{
 		super(level, "Player", x, y, 1);
 		this.input = input;
-		this.userName = userName;
+		this.username = userName;
 	}
 	
 	public void tick()
@@ -27,14 +27,17 @@ public class Player extends Mob {
 		int xa = 0;
 		int ya = 0;
 		
-		if (input.up.isPressed())
-			ya--;
-		if (input.down.isPressed())
-			ya++;
-		if (input.left.isPressed())
-			xa--;
-		if (input.right.isPressed())
-			xa++;
+		if(input != null)
+		{
+			if (input.up.isPressed())
+				ya--;
+			if (input.down.isPressed())
+				ya++;
+			if (input.left.isPressed())
+				xa--;
+			if (input.right.isPressed())
+				xa++;			
+		}
 		
 		if (xa != 0 || ya != 0)
 		{
@@ -116,8 +119,8 @@ public class Player extends Mob {
 			screen.render(xOffset + modtifier - (modtifier * flipBottom), yOffset + modtifier, (xTile + 1) + ((yTile + 1) * 32), colour, flipBottom, scale);
 		}
 		
-		if(userName != null)
-			Font.render(userName, screen, xOffset - ((userName.length() / 2 - 1) * 8), yOffset - 10, Colours.get(-1, -1, -1, 555), 1);
+		if(username != null)
+			Font.render(username, screen, xOffset - ((username.length() / 2 - 1) * 8), yOffset - 10, Colours.get(-1, -1, -1, 555), 1);
 		
 	}
 	
@@ -154,4 +157,8 @@ public class Player extends Mob {
 		return false;
 	}
 	
+	public String getUsername() 
+	{
+		return username;
+	}
 }

@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import com.icyfillup.game.entities.Player;
+import com.icyfillup.game.entities.PlayerMP;
 import com.icyfillup.game.gfx.Screen;
 import com.icyfillup.game.gfx.SpriteSheet;
 import com.icyfillup.game.level.Level;
@@ -89,11 +90,16 @@ public class Game extends Canvas implements Runnable {
 		screen = new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet.png"));
 		input = new InputHandler(this);
 		level = new Level("/levels/water_test_level.png");
-//		player = new Player(level, 0, 0, input, JOptionPane.showInputDialog(this, "Please enter UserName."));
-//		level.addEntity(player);
-//		socketClient.sendData("ping".getBytes());
+		player = new PlayerMP(level, 100, 100, input, JOptionPane.showInputDialog(this, "Please enter UserName."), null, -1);
+		level.addEntity(player);
+		Packet00Login loginPacket = new Packet00Login(player.getUsername());
 		
-		Packet00Login loginPacket = new Packet00Login(JOptionPane.showInputDialog(this, "Please enter UserName."));
+		if(socketServer != null) 
+		{
+			socketServer.addConnection((PlayerMP)player, loginPacket);
+		}
+		
+//		socketClient.sendData("ping".getBytes());	
 		loginPacket.writeData(socketClient);
 	}
 	
