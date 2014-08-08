@@ -147,14 +147,17 @@ public class GameServer extends Thread {
 	
 	public void sendData(byte[] data, InetAddress ipAddress, int port)
 	{
-		DatagramPacket packet = new DatagramPacket(data, data.length, ipAddress, port);
-		try
+		if(!game.isApplet) 
 		{
-			socket.send(packet);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
+			DatagramPacket packet = new DatagramPacket(data, data.length, ipAddress, port);
+			try
+			{
+				socket.send(packet);
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}			
 		}
 	}
 	
@@ -171,9 +174,13 @@ public class GameServer extends Thread {
 		if(getPlayerMP(packet.getUsername()) != null) 
 		{
 			int index = getPlayerMPIndex(packet.getUsername());
-			this.connectedPlayers.get(index).x = packet.getX();
-			this.connectedPlayers.get(index).y = packet.getY();
+			PlayerMP player = this.connectedPlayers.get(index);
+			player.x = packet.getX();
+			player.y = packet.getY();
+			player.setIsMoving(packet.getIsMoving());
+			player.setMovingDir(packet.getMovingDir());
+			player.setNumSteps(packet.getNumSteps());
+			packet.writeData(this);
 		}
-		packet.writeData(this);
 	}
 }

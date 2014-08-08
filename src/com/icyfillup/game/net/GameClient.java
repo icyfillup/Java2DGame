@@ -40,7 +40,7 @@ public class GameClient extends Thread {
 	
 	public void run()
 	{
-		while(true)
+		while (true)
 		{
 			byte[] data = new byte[1024];
 			DatagramPacket packet = new DatagramPacket(data, data.length);
@@ -54,19 +54,18 @@ public class GameClient extends Thread {
 			}
 			
 			this.parsePacket(packet.getData(), packet.getAddress(), packet.getPort());
-//			String message = new String(packet.getData());
-//			System.out.println("SERVER > " + message);
+			// String message = new String(packet.getData());
+			// System.out.println("SERVER > " + message);
 		}
 	}
 	
 	private void parsePacket(byte[] data, InetAddress address, int port)
 	{
 		String message = new String(data).trim();
-		PacketTypes type =  Packet.lookupPacket(message.substring(0, 2));
+		PacketTypes type = Packet.lookupPacket(message.substring(0, 2));
 		Packet packet = null;
 		
-		
-		switch(type)
+		switch (type)
 		{
 			default:
 			case INVALID:
@@ -79,36 +78,40 @@ public class GameClient extends Thread {
 			case DISCONNECT:
 				packet = new Packet01Disconnect(data);
 				System.out.println("[" + address.getHostAddress() + ": " + port + "]" + ((Packet01Disconnect) packet).getUsername() + " has left the world...");
-				game.level.removePlayerMP(((Packet01Disconnect)packet).getUsername());
+				game.level.removePlayerMP(((Packet01Disconnect) packet).getUsername());
 			case MOVE:
 				packet = new Packet02Move(data);
 				handlePacket(((Packet02Move) packet));
 				break;
 		}
 	}
-
+	
 	public void sendData(byte[] data)
 	{
-		DatagramPacket packet = new DatagramPacket(data, data.length, ipAddress, 1331);
-		try
+		if (!game.isApplet)
 		{
-			socket.send(packet);
+			DatagramPacket packet = new DatagramPacket(data, data.length, ipAddress, 1331);
+			try
+			{
+				socket.send(packet);
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		
 	}
 	
 	private void handleLogin(Packet00Login packet, InetAddress address, int port)
 	{
 		System.out.println("[" + address.getHostAddress() + ": " + port + "]" + packet.getUsername() + " has join the game...");
-		PlayerMP player = player = new PlayerMP(game.level, packet.getX(), packet.getY(), packet.getUsername(), address, port);	
+		PlayerMP player = player = new PlayerMP(game.level, packet.getX(), packet.getY(), packet.getUsername(), address, port);
 		game.level.addEntity(player);
 	}
 	
 	private void handlePacket(Packet02Move packet)
 	{
-		this.game.level.movePlayer(packet.getUsername(), packet.getX(), packet.getY());
+		this.game.level.movePlayer(packet.getUsername(), packet.getX(), packet.getY(), packet.getNumSteps(), packet.getIsMoving(), packet.getMovingDir());
 	}
 }
